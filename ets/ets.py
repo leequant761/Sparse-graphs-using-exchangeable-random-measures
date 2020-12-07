@@ -2,7 +2,7 @@ import math
 import numpy as np
 from scipy.stats import uniform, norm, expon
 
-from zolotarev import A, B
+from .zolotarev import A, B
 
 def ets_sampling_Caron(alpha, sigma, tau, n_sample):
     """it samples W_alpha^* defined at (Caron, 2015, 5.3)
