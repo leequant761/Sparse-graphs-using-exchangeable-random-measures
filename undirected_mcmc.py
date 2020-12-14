@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.stats import expon
+from scipy.sparse import find
 
 from simulation import GGPgraphrnd
 from mcmc import HMC, MH
@@ -27,9 +28,11 @@ state = {
     'alpha': 1.,
     'sigma': 0.1,
     'tau': 0.1,
-    'n': np.random.randint(0, 4, (N_alpha, N_alpha))
+    'n': Z.astype(int),
 }
-state['m'] = state['n'].sum(axis=0) + state['n'].sum(axis=1)
+state['m'] = np.array(state['n'].astype(int).sum(axis=0))[0] + \
+            np.array(state['n'].astype(int).sum(axis=1))[0]
+proposal_r_idx, proposal_c_idx, _ = find(Z) # For Step 3, pre-define indices
 
 #
 # Step 1: Update w_{1:N_\alpha}
@@ -45,6 +48,8 @@ state = MH(state, sigma_tau=0.1)
 # Step 3: Update n
 #
 if efficient_way:
-    state['n'] = update_n(Z, state['w'], n_bar=state['n'])
+    state['n'] = update_n(Z, state['w'], n_bar=state['n'],
+                proposal_idx=(proposal_r_idx, proposal_c_idx))
 else:
+
     state['n'] = update_n(Z, state['w'])
