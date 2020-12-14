@@ -48,8 +48,7 @@ state = MH(state, sigma_tau=0.1)
 # Step 3: Update n
 #
 if efficient_way:
-    state['n'] = update_n(Z, state['w'], n_bar=state['n'],
-                proposal_idx=(proposal_r_idx, proposal_c_idx))
+    update_n(Z, state['w'], n_bar=state['n'].data, 
+            proposal_idx=(proposal_r_idx, proposal_c_idx))
 else:
-
     state['n'] = update_n(Z, state['w'])

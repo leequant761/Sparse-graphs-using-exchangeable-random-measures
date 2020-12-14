@@ -59,7 +59,7 @@ def GGPgraphrnd(alpha, sigma, tau):
                     shape=(sum(selected_atom), sum(selected_atom)))
     Z = (D + D.T).astype(bool)
 
-    return Z, w, w_rem
+    return coo_matrix(Z), w, w_rem
 
 if __name__=='__main__':
     # Simulation input
