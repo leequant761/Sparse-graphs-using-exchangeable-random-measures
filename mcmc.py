@@ -5,6 +5,7 @@ from scipy.stats import norm
 from scipy.special import gamma as GAMMA
 
 from ets import ets_sampling_Caron
+from rnd import finite_crm_Caron
 
 def grad_log_posterior(state):
     """
@@ -72,8 +73,12 @@ def MH(state, sigma_tau):
         N_alpha, 
         (freq_term1**m_state['sigma'] - state['tau']**m_state['sigma']) / m_state['sigma']
         )
-    m_state['w_star'] = ets_sampling_Caron(m_state['alpha'],
+    if m_state['sigma'] > 0:
+        m_state['w_star'] = ets_sampling_Caron(m_state['alpha'], 
                                             m_state['sigma'], freq_term1, 1)[0]
+    else:
+        m_state['w_star'] = finite_crm_Caron(m_state['alpha'], m_state['sigma'], 
+                                m_state['tau']+2*state['w'].sum()+state['w_star'])
     freq_term2 = state['tau'] + 2*sum(state['w']) + m_state['w_star']
 
     # compute acceptance probability

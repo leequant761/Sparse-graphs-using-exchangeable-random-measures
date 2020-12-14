@@ -2,6 +2,7 @@ from collections import Counter
 
 from scipy.stats import poisson, gamma, uniform, expon
 from scipy.special import gammaln
+from scipy.special import gamma as GAMMA
 import numpy as np
 from numpy import log as log
 
@@ -70,6 +71,33 @@ def ggprnd(alpha, sigma, tau, trc):
     w2 = np.exp(log_w2[ind2])
 
     return np.concatenate([w1, w2])
+
+def finite_crm_Caron(alpha, sigma, tau):
+    """In total Levy measure is finite case, we can sample directly.
+
+    Parameters
+    ----------
+    alpha : float > 0
+        It specifies Lebesgue measure's support as [0, alpha]. 
+        For detail, see Caron(2015)
+
+    sigma : float < 0
+        It is related to gamma distribution's parameter.
+
+    tau : float > 0
+        It is related gamma distribution's parameter.
+
+    Reference
+    ----------
+    (Caron, 2015)
+    """
+    assert alpha > 0
+    assert sigma < 0
+    assert tau > 0
+    total_measure = (tau**sigma) * GAMMA(-sigma) * alpha / GAMMA(1-sigma)
+    n = poisson(total_measure).rvs()
+    w_s = gamma(-sigma, tau).rvs(n)
+    return w_s.sum()
 
 if __name__=='__main__':
     ggprnd(300, 0.5, 1, 1e-6)
