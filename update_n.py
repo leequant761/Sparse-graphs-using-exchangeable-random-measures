@@ -74,7 +74,15 @@ def update_n(Z, w, n_bar=None):
         n_bar_tilde = n_bar + one_table + over_table
         
         # compute acceptance probability
-        term1 = factorial(n_bar) / factorial(n_bar_tilde)
+        #term1 = factorial(n_bar) / factorial(n_bar_tilde)
+        term1 = np.zeros((N_alpha, N_alpha), dtype=float)
+        term1[n_bar==0] = 1
+        term1[n_bar==1] = 1/2
+        condition1 = (n_bar > 1) & (prob_table > 0.5)
+        condition2 = (n_bar > 1) & (prob_table < 0.5)
+        term1[condition1] = 1 / n_bar_tilde[condition1]
+        term1[condition2] = n_bar[condition2]
+
         # NOTE: I think the below expression is correct
         # term2 = (2 - np.identity(N_alpha, dtype=int)) * np.outer(w, w)
         term2 = (1 + np.identity(N_alpha, dtype=int)) * np.outer(w, w)

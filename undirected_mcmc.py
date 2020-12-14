@@ -27,7 +27,7 @@ state = {
     'alpha': 1.,
     'sigma': 0.1,
     'tau': 0.1,
-    'n': np.ones((N_alpha, N_alpha))
+    'n': np.random.randint(0, 4, (N_alpha, N_alpha))
 }
 state['m'] = state['n'].sum(axis=0) + state['n'].sum(axis=1)
 
