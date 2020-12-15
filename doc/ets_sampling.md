@@ -19,7 +19,7 @@ $$
 
 ​	Therefore, using a simple trick, we can get a Laplace transform as
 $$
-\mathbb{E}\left\{e^{-t S_{\alpha, \lambda}}\right\}=\mathbb{E}_{\alpha}\left\{e^{\lambda^{\alpha}-(t+\lambda) S_{\alpha}}\right\}=e^{\lambda^{\alpha}-(\mu+\lambda)^{\alpha}}
+\mathbb{E}\left\{e^{-t S_{\alpha, \lambda}}\right\}=\mathbb{E}_{\alpha}\left\{e^{\lambda^{\alpha}-(t+\lambda) S_{\alpha}}\right\}=e^{\lambda^{\alpha}-(t+\lambda)^{\alpha}}
 $$
 
 ---
