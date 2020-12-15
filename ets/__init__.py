@@ -1,2 +1,2 @@
-from .ets import ets_sampling_Caron, ets_sampling
+from .ets import ets_sampling_Caron
 from .zolotarev import A, B

@@ -28,30 +28,36 @@ def HMC(state, step_size, num_step):
     N_alpha = len(state['w'])
     h_state = {
         'w': state['w'],
+        'log_w': np.log(state['w']),
         'w_star': state['w_star'],
         'm': state['m'],
         'sigma': state['sigma'],
         'tau': state['tau']
     }
+
     init_p = norm().rvs(N_alpha)
     h_state['p'] = init_p +  step_size/2 * grad_log_posterior(state)
     for l in range(1, num_step):
-        h_state['w'] = h_state['w'] * np.exp(step_size * h_state['p'])
+        # h_state['w'] = h_state['w'] * np.exp(step_size * h_state['p'])
+        h_state['log_w'] = h_state['log_w'] + step_size * h_state['p']
         h_state['p'] = h_state['p'] + step_size*grad_log_posterior(h_state)
-    h_state['w'] = h_state['w'] * np.exp(step_size * h_state['p'])
+    h_state['log_w'] = h_state['w'] + step_size * h_state['p']
     h_state['p'] = -(h_state['p'] + step_size/2 * grad_log_posterior(h_state))
+    h_state['w'] = np.exp(h_state['log_w'])
 
     # Accept the proposal with probability with min(1,r)
-    term1 = (h_state['m'] - h_state['sigma']) * (np.log(h_state['w']) - np.log(state['w']))
+    term1 = (state['m'] - state['sigma']) * (h_state['log_w'] - np.log(state['w']))
     term1 = term1.sum()
     term2 = -(h_state['w'].sum() + state['w_star'])**2
     term3 = (state['w'].sum() + state['w_star'])**2
-    term4 = -h_state['tau'] * (state['w'].sum() + state['w'].sum())
+    term4 = -state['tau'] * (h_state['w'].sum() - state['w'].sum()) # paper errata
     term5 = -1/2 * (h_state['p']**2-init_p**2).sum()
-    r = np.exp(term1 + term2 + term3 + term4 + term5)
-    is_accept = np.random.binomial(1, min(1, r))
+    log_r = term1 + term2 + term3 + term4 + term5
 
-    if is_accept:
+    if np.isnan(log_r):
+        log_r = -np.inf
+
+    if np.log(np.random.uniform()) < log_r:
         state['w'] = h_state['w']
 
     return state
