@@ -37,14 +37,16 @@ def ets_sampling_Caron(alpha, sigma, tau, n_sample):
     assert type(n_sample) == int
 
     M = alpha / sigma
-    T = ets_sampling(alpha=sigma, lambd=M**(1/sigma)*tau, n_sample=n_sample)
-    T = T * M**(1/sigma)
+    log_T = log_ets_sampling(alpha=sigma, lambd=M**(1/sigma)*tau, n_sample=n_sample)
+    # T = T * M**(1/sigma)
+    T = np.exp(log_T + np.log(M)/sigma)
     
     return T
 
 
-def ets_sampling(alpha, lambd, n_sample):
+def log_ets_sampling(alpha, lambd, n_sample):
     """It samples `lambd` exponential tilted stable(alpha) for `n` times.
+    After samples, it logarithms the results for stability of computation.
 
     Parameters
     ----------
@@ -62,6 +64,7 @@ def ets_sampling(alpha, lambd, n_sample):
     ----------
     (Devroye, 2009)
     """
+    assert alpha < 1 and alpha > 0
 
     np.random.seed(100)
 
@@ -99,8 +102,10 @@ def ets_sampling(alpha, lambd, n_sample):
                 #
                 W = uniform(0, 1).rvs()
                 zeta = np.sqrt(B(U, alpha) / B(0, alpha))
-                phi = (np.sqrt(gamma) + alpha*zeta)**(1/alpha)
-                z = phi / (phi - np.sqrt(gamma)**(1/alpha))
+                # phi = (np.sqrt(gamma) + alpha*zeta)**(1/alpha)
+                # z = phi / (phi - np.sqrt(gamma)**(1/alpha))
+                z = 1 / (1 - (1 + alpha*zeta/np.sqrt(gamma))**(-1/alpha) )
+
                 # rho
                 num1 = math.pi * np.exp(-lambd**alpha * (1-zeta**(-2)))
                 cond = U >= 0 and gamma >= 1
@@ -134,14 +139,14 @@ def ets_sampling(alpha, lambd, n_sample):
             elif V_prime < a2/s:
                 X = uniform(m, m+delta).rvs()
             else:
-                E_prime = expon(1).rvs()
+                E_prime = expon().rvs()
                 X = m + delta + E_prime * a3
             # NOTE: X has density prop to g(x, U)
 
             #
             # From X ~ g(x, U), want to sample h(x, U)
             #
-            E = -np.log(Z) # E follows Exponential(1)
+            E = expon().rvs() # E follows Exponential(1)
             cond1 = X >= 0
             # cond2
             sum_list = [
@@ -152,9 +157,34 @@ def ets_sampling(alpha, lambd, n_sample):
             ]
             cond2 = sum(sum_list) <= E
             if cond1 and cond2:
-                output.append( 1/(X**b) )
+                output.append( -b*np.log(X) )
                 break
     return np.array(output)
 
 if __name__=='__main__':
     ets_sampling_Caron(alpha=300, sigma=0.5, tau=1, n_sample=1)
+
+    # test : ets_sampling_caron
+    t = 0.005
+    alpha = 300
+    sigma = 0.5
+    tau = 1
+    M = alpha / sigma
+    # estimate of Laplace transform of ETS_Caron
+    samples = ets_sampling_Caron(alpha=alpha, sigma=sigma, tau=tau, n_sample=5000)
+    estimates = np.exp(-t*samples).mean()
+    # true(analytic) value of Laplace transform of ETS_Caron
+    exponent  = M * (tau**sigma) - (t*M**(1/sigma) + M**(1/sigma)*tau)**sigma
+    true_value = np.exp(exponent)
+    print(f'true value : {true_value} \n estimates : {estimates}')
+
+
+    # test : ets_sampling
+    lambd = 1
+    alpha = 300
+    t = 0.05
+    log_ets_samples = log_ets_sampling(alpha=alpha, lambd=lambd, n_sample=1000)
+    ets_samples = np.exp(log_ets_samples)
+    estimates2 = np.exp(-t * ets_samples).mean()
+    true_value2 = np.exp(lambd**alpha - (t+lambd)**alpha)
+    print(f'true value : {estimates2} \n estimates : {true_value2}')
