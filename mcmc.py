@@ -16,7 +16,7 @@ def grad_log_posterior(state):
     # NOTE: I think the below expression is correct
     # grad = m - (1+state['sigma']) - state['w']*(state['tau'] + 2*sum(state['w'] + 2*state['w_star']))
     grad = state['m'] - state['sigma'] - \
-        state['w'] * (state['tau']+2*sum(state['w']+2*state['w_star']))
+        state['w'] * (state['tau'] + 2*state['w'].sum() + 2*state['w_star'])
     return grad
 
 def HMC(state, step_size, num_step):
@@ -30,7 +30,6 @@ def HMC(state, step_size, num_step):
         'w': state['w'],
         'w_star': state['w_star'],
         'm': state['m'],
-        'alpha': state['alpha'],
         'sigma': state['sigma'],
         'tau': state['tau']
     }
