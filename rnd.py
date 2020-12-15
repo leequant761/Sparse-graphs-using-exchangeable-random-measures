@@ -96,8 +96,9 @@ def finite_crm_Caron(alpha, sigma, tau):
     assert tau > 0
     total_measure = (tau**sigma) * GAMMA(-sigma) * alpha / GAMMA(1-sigma)
     n = poisson(total_measure).rvs()
-    w_s = gamma(-sigma, tau).rvs(n)
+    w_s = gamma(a=-sigma, scale=1/tau).rvs(n)
     return w_s.sum()
 
 if __name__=='__main__':
     ggprnd(300, 0.5, 1, 1e-6)
+    finite_crm_Caron(300, -1, 1)
