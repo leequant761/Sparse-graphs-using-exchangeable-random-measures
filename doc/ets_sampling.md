@@ -19,7 +19,7 @@ $$
 
 ​	Therefore, using a simple trick, we can get a Laplace transform as
 $$
-\mathbb{E}\left\{e^{-t S_{\alpha, \lambda}}\right\}=\mathbb{E}_{\alpha}\left\{e^{\lambda^{\alpha}-(t+\lambda) S_{\alpha}}\right\}=e^{\lambda^{\alpha}-(t+\lambda)^{\alpha}}
+\mathbb{E}\left\{e^{-t S_{\alpha, \lambda}}\right\}=\mathbb{E}_{\alpha}\left\{e^{-\lambda^{\alpha}-(t+\lambda) S_{\alpha}}\right\}=e^{-\lambda^{\alpha}-(t+\lambda)^{\alpha}}
 $$
 
 ---
@@ -53,15 +53,15 @@ $$
 
 \\\\
 
-&=  \exp \left\{  \frac{\alpha}{\sigma} \times \left (\tau^{\sigma}-(t + \tau)^{\sigma} \right ) \right\}
+&=  \exp \left\{  \frac{\alpha}{\sigma} \times \left (-\tau^{\sigma}-(t + \tau)^{\sigma} \right ) \right\}
 
 \\\\
 
-&=: \exp \left\{  M \times \left (\tau^{\sigma}-( t+\tau)^{\sigma} \right ) \right\}
+&=: \exp \left\{  M \times \left (-\tau^{\sigma}-(t+\tau)^{\sigma} \right ) \right\}
 
 \\\\
 
-&=  \exp \left\{ \left ( \left(M^{\frac{1}{\sigma}}\tau \right)^{\sigma}- \left(M^{\frac{1}{\sigma}} t+ M^{\frac{1}{\sigma}}\tau \right)^{\sigma} \right ) \right\}
+&=  \exp \left\{ \left ( -\left(M^{\frac{1}{\sigma}}\tau \right)^{\sigma}- \left(M^{\frac{1}{\sigma}} t+ M^{\frac{1}{\sigma}}\tau \right)^{\sigma} \right ) \right\}
 
 \\\\
 
