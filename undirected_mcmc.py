@@ -30,7 +30,7 @@ EPSILON = 1e-4
 np.random.seed(100)
 state = {
     'w': gamma(a=1, scale=1/1).rvs(N_alpha),
-    'w_star': gamma(a=1, scale=1/1).rvs(1),
+    'w_star': gamma(a=1, scale=1/1).rvs(),
     'alpha': 100*uniform.rvs(),
     'sigma': 0.1,
     'tau': 10*uniform.rvs(),
@@ -73,9 +73,9 @@ for epoch in range(10000):
     if epoch % 100 == 0:
         print(f'EPOCH : {epoch}')
         print('w_star: {0:.2f} \n alpha: {1:.2f} \n sigma: {2:.2f} \n tau: {3:.2f}'\
-        .format(state['w_star'][0], state['alpha'][0], state['sigma'], state['tau']))
-    history['w_star'].append(state['w_star'][0])
-    history['alpha'].append(state['alpha'][0])
+        .format(state['w_star'], state['alpha'], state['sigma'], state['tau']))
+    history['w_star'].append(state['w_star'])
+    history['alpha'].append(state['alpha'])
     history['sigma'].append(state['sigma'])
     history['tau'].append(state['tau'])
 
