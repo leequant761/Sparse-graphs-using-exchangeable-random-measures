@@ -26,7 +26,7 @@ state = {
     'w': gamma(a=1, scale=1/1).rvs(N_alpha),
     'w_star': gamma(a=1, scale=1/1).rvs(1),
     'alpha': 100*uniform.rvs(),
-    'sigma': 2*uniform.rvs() - 1,
+    'sigma': 0.1,
     'tau': 10*uniform.rvs(),
     'n': Z.astype(int),
 }
@@ -44,7 +44,7 @@ for epoch in range(10000):
     #
     # Step 2: Update w_star, phi
     #
-    state = MH(state, sigma_tau=0.1)
+    state = MH(state, sigma_tau=0.02)
 
     #
     # Step 3: Update n
