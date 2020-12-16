@@ -1,6 +1,10 @@
+import datetime
+import os
+
 import numpy as np
 from scipy.stats import gamma, uniform
 from scipy.sparse import find
+import pandas as pd
 
 from simulation import GGPgraphrnd
 from mcmc import HMC, MH
@@ -10,6 +14,8 @@ Z, _, _ = GGPgraphrnd(alpha=300, sigma=0.5, tau=1)
 N_alpha = Z.shape[0]
 edge_number = (Z.sum()- sum(Z.diagonal())) / 2 # except self-loop
 print(f"Num Nodes : [{N_alpha}] \nNum Edges : [{edge_number}]")
+
+now = datetime.datetime.now().strftime("%m%d-%H%M")
 
 #
 # HMC Setting
@@ -35,6 +41,12 @@ state['m'] = np.array(state['n'].astype(int).sum(axis=0))[0] + \
             np.array(state['n'].astype(int).sum(axis=1))[0]
 proposal_r_idx, proposal_c_idx, _ = find(Z) # For Step 3, pre-define indices
 
+history = {
+    'w_star': [],
+    'alpha': [],
+    'sigma': [],
+    'tau': []
+}
 for epoch in range(10000):
     #
     # Step 1: Update w_{1:N_\alpha}
@@ -54,3 +66,19 @@ for epoch in range(10000):
                 proposal_idx=(proposal_r_idx, proposal_c_idx))
     else:
         state['n'] = update_n(Z, state['w'])
+
+    #
+    # Notification & Save
+    #
+    if epoch % 100 == 0:
+        print(f'EPOCH : {epoch}')
+        print('w_star: {0:.2f} \n alpha: {1:.2f} \n sigma: {2:.2f} \n tau: {3:.2f}'\
+        .format(state['w_star'][0], state['alpha'][0], state['sigma'], state['tau']))
+    history['w_star'].append(state['w_star'][0])
+    history['alpha'].append(state['alpha'][0])
+    history['sigma'].append(state['sigma'])
+    history['tau'].append(state['tau'])
+
+if not 'results' in os.listdir('.'):
+    os.mkdir('./results')
+pd.DataFrame(history).to_csv(f'./{now}results.csv')
