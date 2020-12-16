@@ -37,14 +37,16 @@ def ets_sampling_Caron(alpha, sigma, tau, n_sample):
     assert type(n_sample) == int
 
     M = alpha / sigma
-    log_T = log_ets_sampling(alpha=sigma, lambd=M**(1/sigma)*tau, n_sample=n_sample)
+    # log_T = log_ets_sampling(alpha=sigma, lambd=M**(1/sigma)*tau, n_sample=n_sample)
+    # NOTE : for numerical stability, change lambd ==> lambd_alpha
+    log_T = log_ets_sampling(alpha=sigma, lambd_alpha=M*tau**sigma, n_sample=n_sample)
     # T = T * M**(1/sigma)
     T = np.exp(log_T + np.log(M)/sigma)
     
     return T
 
 
-def log_ets_sampling(alpha, lambd, n_sample):
+def log_ets_sampling(alpha, lambd_alpha, n_sample):
     """It samples `lambd` exponential tilted stable(alpha) for `n` times.
     After samples, it logarithms the results for stability of computation.
 
@@ -53,9 +55,8 @@ def log_ets_sampling(alpha, lambd, n_sample):
     alpha : float in (0, 1)
         It is related to stable distribution's parameter.
 
-    lambd : float 
-        Number of (training) examples per class in each task. This corresponds
-        to `k` in `k-shot` classification.
+    lambd_alpha : float 
+        lambd_alpha = lambd ^ alpha
 
     n_sample : int
         The number of samples
@@ -71,7 +72,7 @@ def log_ets_sampling(alpha, lambd, n_sample):
     #
     # setup
     #
-    gamma = (lambd ** alpha) * alpha * (1-alpha)
+    gamma = (lambd_alpha) * alpha * (1-alpha)
     xi = ((2 + np.sqrt(math.pi/2)) * np.sqrt(2*gamma) + 1) / math.pi
     psi = np.exp( -(gamma * math.pi**2)/8 ) * \
             (2 + np.sqrt(math.pi/2)) * np.sqrt(gamma * math.pi)  / math.pi
@@ -107,7 +108,7 @@ def log_ets_sampling(alpha, lambd, n_sample):
                 z = 1 / (1 - (1 + alpha*zeta/np.sqrt(gamma))**(-1/alpha) )
 
                 # rho
-                num1 = math.pi * np.exp(-lambd**alpha * (1-zeta**(-2)))
+                num1 = math.pi * np.exp(-lambd_alpha * (1-zeta**(-2)))
                 cond = U >= 0 and gamma >= 1
                 num2 = np.where(cond, xi * np.exp(-gamma*U**2 / 2), 0.)
                 cond = U > 0 and U < math.pi
@@ -126,7 +127,7 @@ def log_ets_sampling(alpha, lambd, n_sample):
             # From U ~ g*, want to sample g(x, U)
             #
             a = A(U, alpha)
-            m = (b * lambd / a) ** alpha
+            m = (b / a) ** alpha * lambd_alpha
             delta = np.sqrt(m * alpha / a)
             a1, a2, a3 = delta * np.sqrt(math.pi / 2), delta, z/a
             s = a1 + a2 + a3
@@ -151,7 +152,8 @@ def log_ets_sampling(alpha, lambd, n_sample):
             # cond2
             sum_list = [
                 a * (X - m),
-                lambd * (X**(-b) - m**(-b)),
+                # lambd * (X**(-b) - m**(-b)),
+                np.exp(1/alpha*np.log(lambd_alpha) - b*np.log(m)) * ((m/X)**b - 1),
                 np.where(X < m, -N_prime**2 /2, 0),
                 np.where(X > m+delta, -E_prime, 0)
             ]
