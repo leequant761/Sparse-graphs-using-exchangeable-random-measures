@@ -4,7 +4,7 @@ import numpy as np
 from numpy import log
 from numpy.random import lognormal, gamma
 from scipy.stats import norm
-from scipy.special import gamma as GAMMA
+from scipy.special import gammaln
 
 from ets import ets_sampling_Caron
 from rnd import finite_crm_Caron
@@ -74,56 +74,57 @@ def MH(state, sigma_tau):
     ----------
     (Caron, 2015) E.1. Step 2
     """
-    # to avoid repeated computation
-    w_sum = state['w'].sum()
+    for _ in range(2):
+        # to avoid repeated computation
+        w_sum = state['w'].sum()
 
-    N_alpha = len(state['w'])
-    m_state = {
-        'tau': lognormal(log(state['tau']), sigma_tau),
-        'sigma': 1-lognormal(log(1-state['sigma']), sigma_tau),
-    }
-    freq_term1 = m_state['tau'] + 2*w_sum + state['w_star']
-    m_state['alpha'] = gamma(
-        N_alpha, 
-        m_state['sigma'] / (freq_term1**m_state['sigma'] - state['tau']**m_state['sigma'])
-        )
-    if m_state['sigma'] > 0:
-        m_state['w_star'] = ets_sampling_Caron(m_state['alpha'], 
-                                            m_state['sigma'], freq_term1, 1)[0]
-    else:
-        m_state['w_star'] = finite_crm_Caron(m_state['alpha'], m_state['sigma'], 
-                                m_state['tau']+2*w_sum+state['w_star'])
-    
-    # freq_term2 = state['tau'] + 2*w_sum + m_state['w_star']
+        N_alpha = len(state['w'])
+        m_state = {
+            'tau': lognormal(log(state['tau']), sigma_tau),
+            'sigma': 1-lognormal(log(1-state['sigma']), sigma_tau),
+        }
+        freq_term1 = m_state['tau'] + 2*w_sum + 2*state['w_star']
+        m_state['alpha'] = gamma(
+            N_alpha, 
+            m_state['sigma'] / (freq_term1**m_state['sigma'] - state['tau']**m_state['sigma'])
+            )
+        if m_state['sigma'] > 0:
+            m_state['w_star'] = ets_sampling_Caron(m_state['alpha'], 
+                                                m_state['sigma'], freq_term1, 1)[0]
+        else:
+            m_state['w_star'] = finite_crm_Caron(m_state['alpha'], m_state['sigma'], 
+                                    m_state['tau']+2*w_sum+2*state['w_star'])
+        
+        # freq_term2 = state['tau'] + 2*w_sum + m_state['w_star']
 
-    # compute acceptance probability
-    term1 = (w_sum + state['w_star'])**2 - (w_sum + m_state['w_star'])**2
-    term2 = -(m_state['tau']-state['tau']-2*m_state['w_star']+2*state['w_star']) * w_sum
-    term3 = (-m_state['sigma']+state['sigma']) * log(state['w']).sum()
-    
-    # term4's numerator
-    term4_n1 = log(GAMMA(1-state['sigma']))
-    # term4_n2 = log((freq_term2**state['sigma'] - state['tau']**state['sigma']) / state['sigma'])
-    stable_term2 = 1 + (2*w_sum + m_state['w_star']) / state['tau']
-    stable_term2 = (stable_term2 ** state['sigma'] - 1) / state['sigma']
-    term4_n2 = log(stable_term2) + state['sigma'] * log(state['tau'])
-    term4_n = term4_n1 + term4_n2
-    
-    # term4's denominator
-    term4_d1 = log(GAMMA(1-m_state['sigma']))
-    # term4_d2 = log(freq_term1**m_state['sigma'] - m_state['tau']**m_state['sigma'])
-    stable_term1 = 1 + (2*w_sum + state['w_star']) / m_state['tau']
-    stable_term1 = (stable_term1 ** m_state['sigma'] - 1) / m_state['sigma']
-    term4_d2 = log(stable_term1) + m_state['sigma'] * log(m_state['tau'])
-    term4_d = term4_d1 + term4_d2
+        # compute acceptance probability
+        term1 = (w_sum + state['w_star'])**2 - (w_sum + m_state['w_star'])**2
+        term2 = -(m_state['tau']-state['tau']-2*m_state['w_star']+2*state['w_star']) * w_sum
+        term3 = (-m_state['sigma']+state['sigma']) * log(state['w']).sum()
+        
+        # term4's numerator
+        term4_n1 = gammaln(1-state['sigma'])
+        # term4_n2 = log((freq_term2**state['sigma'] - state['tau']**state['sigma']) / state['sigma'])
+        stable_term2 = 1 + (2*w_sum + 2*m_state['w_star']) / state['tau']
+        stable_term2 = (stable_term2 ** state['sigma'] - 1) / state['sigma']
+        term4_n2 = log(stable_term2) + state['sigma'] * log(state['tau'])
+        term4_n = term4_n1 + term4_n2
+        
+        # term4's denominator
+        term4_d1 = gammaln(1-m_state['sigma'])
+        # term4_d2 = log(freq_term1**m_state['sigma'] - m_state['tau']**m_state['sigma'])
+        stable_term1 = 1 + (2*w_sum + 2*state['w_star']) / m_state['tau']
+        stable_term1 = (stable_term1 ** m_state['sigma'] - 1) / m_state['sigma']
+        term4_d2 = log(stable_term1) + m_state['sigma'] * log(m_state['tau'])
+        term4_d = term4_d1 + term4_d2
 
-    term4 = N_alpha * (term4_n - term4_d)
-    
-    log_r = term1 + term2 + term3 + term4
-    if log(random.random()) < log_r:
-        state['alpha'] = m_state['alpha']
-        state['sigma'] = m_state['sigma']
-        state['tau'] = m_state['tau']
-        state['w_star'] = m_state['w_star']
+        term4 = N_alpha * (term4_n - term4_d)
+        
+        log_r = term1 + term2 + term3 + term4
+        if log(random.random()) < log_r:
+            state['alpha'] = m_state['alpha']
+            state['sigma'] = m_state['sigma']
+            state['tau'] = m_state['tau']
+            state['w_star'] = m_state['w_star']
 
     return state
