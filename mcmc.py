@@ -42,11 +42,12 @@ def HMC(state, step_size, num_step):
     for l in range(1, num_step):
         # h_state['w'] = h_state['w'] * np.exp(step_size * h_state['p'])
         h_state['log_w'] = h_state['log_w'] + step_size * h_state['p']
+        h_state['w'] = np.exp(h_state['log_w'])
         h_state['p'] = h_state['p'] + step_size*grad_log_posterior(h_state)
     h_state['log_w'] = h_state['w'] + step_size * h_state['p']
-    h_state['p'] = -(h_state['p'] + step_size/2 * grad_log_posterior(h_state))
     h_state['w'] = np.exp(h_state['log_w'])
-
+    h_state['p'] = -(h_state['p'] + step_size/2 * grad_log_posterior(h_state))
+    
     # to avoid repeated computation
     w_sum = state['w'].sum()
     wprop_sum= h_state['w'].sum()
