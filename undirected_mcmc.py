@@ -81,4 +81,5 @@ for epoch in range(10000):
 
 if not 'results' in os.listdir('.'):
     os.mkdir('./results')
-pd.DataFrame(history).to_csv(f'./{now}results.csv')
+os.mkdir(f'./results/{now}')
+pd.DataFrame(history).to_csv(f'./results/{now}results.csv')
