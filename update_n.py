@@ -73,9 +73,7 @@ def compute_acceptance(n, r, c, w):
     case1 = prev_one
     row_idx, col_idx, n_bar = r[case1], c[case1], n[case1]
     n_tilde1 = n_bar + 1
-    # NOTE: I think the below expression is correct
-    # r = 1/2 * ((1+(row_idx!=col_idx)) * w[row_idx] * w[col_idx]) * 1/2
-    r1 = 1/2 * ((1+(row_idx==col_idx)) * w[row_idx] * w[col_idx]) * 1/2
+    r1 = 1/2 * ((1+(row_idx!=col_idx)) * w[row_idx] * w[col_idx]) * 1/2
     r1[r1>1] = 1.
 
     #
@@ -84,9 +82,7 @@ def compute_acceptance(n, r, c, w):
     case21 = prev_two & q
     row_idx, col_idx, n_bar = r[case21], c[case21], n[case21]
     n_tilde21 = n_bar + 1
-    # NOTE: I think the below expression is correct
-    # r21 = r21 = 1/(n_tilde21) * ((1+(row_idx!=col_idx)) * w[row_idx] * w[col_idx])
-    r21 = 1/(n_tilde21) * ((1+(row_idx==col_idx)) * w[row_idx] * w[col_idx])
+    r21 = 1/(n_tilde21) * ((1+(row_idx!=col_idx)) * w[row_idx] * w[col_idx])
     r21[r21>1] = 1.
 
     #
@@ -95,9 +91,7 @@ def compute_acceptance(n, r, c, w):
     case22 = prev_two & ~q
     row_idx, col_idx, n_bar = r[case22], c[case22], n[case22]
     n_tilde22 = n_bar - 1
-    # NOTE: I think the below expression is correct
-    # r22 = n_bar / ((1+(row_idx!=col_idx)) * w[row_idx] * w[col_idx]) * 2
-    r22 = n_bar / ((1+(row_idx==col_idx)) * w[row_idx] * w[col_idx]) * 2
+    r22 = n_bar / ((1+(row_idx!=col_idx)) * w[row_idx] * w[col_idx]) * 2
     r22[r22>1] = 1.
 
     #
@@ -106,9 +100,7 @@ def compute_acceptance(n, r, c, w):
     case31 = prev_other & q
     row_idx, col_idx, n_bar = r[case31], c[case31], n[case31]
     n_tilde31 = n_bar + 1
-    # NOTE: I think the below expression is correct
-    # r31 = r31 = 1/(n_tilde31) * ((1+(row_idx!=col_idx)) * w[row_idx] * w[col_idx])
-    r31 = 1/(n_tilde31) * ((1+(row_idx==col_idx)) * w[row_idx] * w[col_idx])
+    r31 = 1/(n_tilde31) * ((1+(row_idx!=col_idx)) * w[row_idx] * w[col_idx])
     r31[r31>1] = 1.
 
     #
@@ -117,9 +109,7 @@ def compute_acceptance(n, r, c, w):
     case32 = prev_two & ~q
     row_idx, col_idx, n_bar = r[case32], c[case32], n[case32]
     n_tilde32 = n_bar - 1
-    # NOTE: I think the below expression is correct
-    # r32 = n_bar / ((1+(row_idx!=col_idx)) * w[row_idx] * w[col_idx])
-    r32 = n_bar / ((1+(row_idx==col_idx)) * w[row_idx] * w[col_idx])
+    r32 = n_bar / ((1+(row_idx!=col_idx)) * w[row_idx] * w[col_idx])
     r32[r32>1] = 1.
 
     acceptance_pbt = np.zeros(len(n))
