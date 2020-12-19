@@ -44,7 +44,7 @@ def HMC(state, step_size, num_step):
         h_state['log_w'] = h_state['log_w'] + step_size * h_state['p']
         h_state['w'] = np.exp(h_state['log_w'])
         h_state['p'] = h_state['p'] + step_size*grad_log_posterior(h_state)
-    h_state['log_w'] = h_state['w'] + step_size * h_state['p']
+    h_state['log_w'] = h_state['log_w'] + step_size * h_state['p']
     h_state['w'] = np.exp(h_state['log_w'])
     h_state['p'] = -(h_state['p'] + step_size/2 * grad_log_posterior(h_state))
     
@@ -96,8 +96,6 @@ def MH(state, sigma_tau):
             m_state['w_star'] = finite_crm_Caron(m_state['alpha'], m_state['sigma'], 
                                     m_state['tau']+2*w_sum+2*state['w_star'])
         
-        # freq_term2 = state['tau'] + 2*w_sum + m_state['w_star']
-
         # compute acceptance probability
         term1 = (w_sum + state['w_star'])**2 - (w_sum + m_state['w_star'])**2
         term2 = -(m_state['tau']-state['tau']-2*m_state['w_star']+2*state['w_star']) * w_sum
@@ -105,6 +103,7 @@ def MH(state, sigma_tau):
         
         # term4's numerator
         term4_n1 = gammaln(1-state['sigma'])
+        # freq_term2 = state['tau'] + 2*w_sum + m_state['w_star']
         # term4_n2 = log((freq_term2**state['sigma'] - state['tau']**state['sigma']) / state['sigma'])
         stable_term2 = 1 + (2*w_sum + 2*m_state['w_star']) / state['tau']
         stable_term2 = (stable_term2 ** state['sigma'] - 1) / state['sigma']
