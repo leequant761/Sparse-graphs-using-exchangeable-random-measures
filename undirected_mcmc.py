@@ -3,14 +3,21 @@ import os
 
 import numpy as np
 from scipy.stats import gamma, uniform
-from scipy.sparse import find
+from scipy.sparse import find, coo_matrix, triu
 import pandas as pd
 
 from simulation import GGPgraphrnd
 from mcmc import HMC, MH
 from update_n import update_n
 
+np.random.seed(110)
 Z, _, _ = GGPgraphrnd(alpha=300, sigma=0.5, tau=1)
+# test
+Z = pd.read_csv('./test/sparse.csv', header=None)
+Z = coo_matrix(Z.values, dtype=bool)
+
+Z2 = triu(Z + Z.T > 0) # By convention, we just need to infer upper triangle's n_ij
+
 N_alpha = Z.shape[0]
 edge_number = (Z.sum()- sum(Z.diagonal())) / 2 # except self-loop
 print(f"Num Nodes : [{N_alpha}] \nNum Edges : [{edge_number}]")
@@ -34,12 +41,12 @@ state = {
     'alpha': 100*uniform.rvs(),
     'sigma': 0.1,
     'tau': 10*uniform.rvs(),
-    'n': Z.astype(int),
+    'n': Z2.astype(int),
 }
 state['n'].data = np.random.randint(1, 10+1, len(state['n'].data))
-state['m'] = np.array(state['n'].astype(int).sum(axis=0))[0] + \
-            np.array(state['n'].astype(int).sum(axis=1))[0]
-proposal_r_idx, proposal_c_idx, _ = find(Z) # For Step 3, pre-define indices
+state['m'] = np.array(state['n'].sum(axis=0))[0] + \
+            np.array(state['n'].sum(axis=1))[:,0]
+proposal_r_idx, proposal_c_idx, _ = find(Z2) # For Step 3, pre-define indices
 
 history = {
     'w_star': [],
@@ -61,11 +68,10 @@ for epoch in range(10000):
     #
     # Step 3: Update n
     #
-    if efficient_way:
-        update_n(Z, state['w'], n_bar=state['n'].data, 
-                proposal_idx=(proposal_r_idx, proposal_c_idx))
-    else:
-        state['n'] = update_n(Z, state['w'])
+    state['n'].data = update_n(state['w'], n_bar=np.array(state['n'].data), 
+                                proposal_idx=(proposal_r_idx, proposal_c_idx))
+    state['m'] = np.array(state['n'].sum(axis=0))[0] + \
+                np.array(state['n'].sum(axis=1))[:,0]
 
     #
     # Notification & Save
@@ -82,4 +88,4 @@ for epoch in range(10000):
 if not 'results' in os.listdir('.'):
     os.mkdir('./results')
 os.mkdir(f'./results/{now}')
-pd.DataFrame(history).to_csv(f'./results/{now}results.csv')
+pd.DataFrame(history).to_csv(f'./results/{now}/results.csv')
