@@ -58,7 +58,7 @@ history = {
     'sigma': [],
     'tau': []
 }
-for epoch in range(10000):
+for epoch in range(N_ITER):
     #
     # Step 1: Update w_{1:N_\alpha}
     #
