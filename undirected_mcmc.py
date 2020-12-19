@@ -28,8 +28,12 @@ now = datetime.datetime.now().strftime("%m%d-%H%M")
 # HMC Setting
 #
 L = 10
-efficient_way = True
-EPSILON = 1e-4
+EPSILON = 1e-2
+N_ADAPT = 12500
+ADAPT_PBT = 0.6
+ADAPT_STEP_SIZE = 0.01
+rates = np.array([])
+N_ITER = 50000
 
 #
 # Step 0: Initialization; phi = (alpha, sigma, tau)
@@ -58,7 +62,10 @@ for epoch in range(10000):
     #
     # Step 1: Update w_{1:N_\alpha}
     #
-    state = HMC(state, step_size=EPSILON, num_step=L)
+    state, a_rate = HMC(state, step_size=EPSILON, num_step=L)
+    if epoch < N_ADAPT:
+        rates = np.append(rates, a_rate)
+        EPSILON = np.exp(np.log(EPSILON) + ADAPT_STEP_SIZE*(rates.mean() - ADAPT_PBT))
 
     #
     # Step 2: Update w_star, phi

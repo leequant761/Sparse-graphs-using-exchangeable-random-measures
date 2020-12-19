@@ -67,7 +67,7 @@ def HMC(state, step_size, num_step):
     if np.log(np.random.uniform()) < log_r:
         state['w'] = h_state['w']
 
-    return state
+    return state, min(1., np.exp(log_r))
 
 def MH(state, sigma_tau):
     """
