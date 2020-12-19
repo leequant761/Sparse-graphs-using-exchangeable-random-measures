@@ -33,7 +33,6 @@ def GGPgraphrnd(alpha, sigma, tau):
     https://github.com/misxenia/SNetOC/GGP/GGPgraphrnd.m
     """
     # `epsilon` truncated sampling
-    np.random.seed(100)
     epsilon = 1e-6
     W = ggprnd(alpha, sigma, tau, trc=epsilon)
 

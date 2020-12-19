@@ -67,8 +67,6 @@ def log_ets_sampling(alpha, lambd_alpha, n_sample):
     """
     assert alpha < 1 and alpha > 0
 
-    np.random.seed(100)
-
     #
     # setup
     #
