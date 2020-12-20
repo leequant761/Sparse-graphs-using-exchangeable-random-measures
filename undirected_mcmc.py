@@ -12,10 +12,6 @@ from update_n import update_n
 
 np.random.seed(110)
 Z, _, _ = GGPgraphrnd(alpha=300, sigma=0.5, tau=1)
-# test
-Z = pd.read_csv('./test/sparse.csv', header=None)
-Z = coo_matrix(Z.values, dtype=bool)
-
 Z2 = triu(Z + Z.T > 0) # By convention, we just need to infer upper triangle's n_ij
 
 N_alpha = Z.shape[0]
@@ -34,6 +30,8 @@ ADAPT_PBT = 0.6
 ADAPT_STEP_SIZE = 0.01
 rates = np.array([])
 N_ITER = 50000
+N_BURN = 10000
+THIN = 2
 
 #
 # Step 0: Initialization; phi = (alpha, sigma, tau)
@@ -43,7 +41,7 @@ state = {
     'w': gamma(a=1, scale=1/1).rvs(N_alpha),
     'w_star': gamma(a=1, scale=1/1).rvs(),
     'alpha': 100*uniform.rvs(),
-    'sigma': 0.1,
+    'sigma': 2*uniform.rvs()-1,
     'tau': 10*uniform.rvs(),
     'n': Z2.astype(int),
 }
@@ -87,10 +85,11 @@ for epoch in range(N_ITER):
         print(f'EPOCH : {epoch}')
         print('w_star: {0:.2f} \n alpha: {1:.2f} \n sigma: {2:.2f} \n tau: {3:.2f}'\
         .format(state['w_star'], state['alpha'], state['sigma'], state['tau']))
-    history['w_star'].append(state['w_star'])
-    history['alpha'].append(state['alpha'])
-    history['sigma'].append(state['sigma'])
-    history['tau'].append(state['tau'])
+    if (epoch > N_BURN) and  (epoch % THIN) == 0:
+        history['w_star'].append(state['w_star'])
+        history['alpha'].append(state['alpha'])
+        history['sigma'].append(state['sigma'])
+        history['tau'].append(state['tau'])
 
 if not 'results' in os.listdir('.'):
     os.mkdir('./results')
