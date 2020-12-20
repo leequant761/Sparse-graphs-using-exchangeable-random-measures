@@ -89,9 +89,11 @@ def MH(state, sigma_tau):
             N_alpha, 
             m_state['sigma'] / (freq_term1**m_state['sigma'] - state['tau']**m_state['sigma'])
             )
-        if m_state['sigma'] > 0:
+        if m_state['sigma'] >= 1e-8:
             m_state['w_star'] = ets_sampling_Caron(m_state['alpha'], 
                                                 m_state['sigma'], freq_term1, 1)[0]
+        elif (m_state['sigma'] < 1e-8) and (m_state['sigma'] > -1e-8):
+            m_state['w_star'] = gamma(m_state['alpha'], 1/m_state['tau'])
         else:
             m_state['w_star'] = finite_crm_Caron(m_state['alpha'], m_state['sigma'], 
                                     m_state['tau']+2*w_sum+2*state['w_star'])
