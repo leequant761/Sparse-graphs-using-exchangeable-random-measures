@@ -62,6 +62,6 @@ We got exactly same MCMC samples with the paper
 
 #### [USAirport](http://opsahl.co.uk/tnet/datasets/USairport_2010.dl)
 
-![airport](./picture\airport.png)
+![airport](./picture/airport.png)
 
 We got different MCMC samples with the paper. It needs to be examined, as soon as possible.
