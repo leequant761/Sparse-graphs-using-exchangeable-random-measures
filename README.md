@@ -42,7 +42,7 @@ We burned 10000 samples and take thinning with 2
 python main.py --dataset=simul
 ```
 
-![simulation](D:\카이스트\베이지안머신러닝\project_code\picture\simulation.png)
+![simulation](./picture/simulation.png)
 
 We got exactly same MCMC samples with the paper
 
@@ -54,7 +54,7 @@ We got exactly same MCMC samples with the paper
 python main.py --dataset=email
 ```
 
-![email](D:\카이스트\베이지안머신러닝\project_code\picture\email.png)
+![email](./picture/email.png)
 
 We got exactly same MCMC samples with the paper
 
@@ -62,6 +62,6 @@ We got exactly same MCMC samples with the paper
 
 #### [USAirport](http://opsahl.co.uk/tnet/datasets/USairport_2010.dl)
 
-![airport](D:\카이스트\베이지안머신러닝\project_code\picture\airport.png)
+![airport](./picture\airport.png)
 
 We got different MCMC samples with the paper. It needs to be examined, as soon as possible.
