@@ -42,7 +42,7 @@ We burned 10000 samples and take thinning with 2
 python main.py --dataset=simul
 ```
 
-![simulation](./picture/simulation.png)
+![simulation](https://github.com/leequant761/Sparse-graphs-using-exchangeable-random-measures/blob/main/picture/simulation.png)
 
 We got exactly same MCMC samples with the paper
 
@@ -54,7 +54,7 @@ We got exactly same MCMC samples with the paper
 python main.py --dataset=email
 ```
 
-![email](./picture/email.png)
+![email](https://github.com/leequant761/Sparse-graphs-using-exchangeable-random-measures/blob/main/picture/email.png)
 
 We got exactly same MCMC samples with the paper
 
@@ -62,6 +62,6 @@ We got exactly same MCMC samples with the paper
 
 #### [USAirport](http://opsahl.co.uk/tnet/datasets/USairport_2010.dl)
 
-![airport](./picture/airport.png)
+![airport](https://github.com/leequant761/Sparse-graphs-using-exchangeable-random-measures/blob/main/picture/airport.png)
 
 We got different MCMC samples with the paper. It needs to be examined, as soon as possible.
